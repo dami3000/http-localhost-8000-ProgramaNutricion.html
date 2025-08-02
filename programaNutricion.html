@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de Nutrición Inteligente con IA (8 Semanas)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-secondary {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #c7d2fe;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 90%;
+            width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .week-tab {
+            cursor: pointer;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .week-tab.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        .day-checkbox:checked + label {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Asistente de Nutrición Inteligente ✨</h1>
+            <p class="text-lg text-gray-600 mt-2">Tu plan de 8 semanas y recetas personalizadas con IA.</p>
+        </header>
+
+        <div class="card p-6 md:p-8 mb-8">
+            <form id="user-form">
+                <h2 class="text-2xl font-bold mb-6 text-gray-700 border-b pb-3">1. Cuéntanos sobre ti</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
+                        <input type="number" id="age" name="age" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: 28" required>
+                    </div>
+                    <div>
+                        <label for="gender" class="block text-sm font-medium text-gray-700">Género</label>
+                        <select id="gender" name="gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                            <option value="male">Masculino</option>
+                            <option value="female">Femenino</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-700">Peso (kg)</label>
+                        <input type="number" id="weight" name="weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: 75" required>
+                    </div>
+                    <div>
+                        <label for="height" class="block text-sm font-medium text-gray-700">Altura (cm)</label>
+                        <input type="number" id="height" name="height" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: 180" required>
+                    </div>
+                    <div>
+                        <label for="activity" class="block text-sm font-medium text-gray-700">Nivel de Actividad</label>
+                        <select id="activity" name="activity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                            <option value="1.2">Sedentario</option>
+                            <option value="1.375">Ligero</option>
+                            <option value="1.55">Moderado</option>
+                            <option value="1.725">Activo</option>
+                            <option value="1.9">Muy Activo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="goal" class="block text-sm font-medium text-gray-700">Tu Objetivo</label>
+                        <select id="goal" name="goal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                            <option value="lose">Perder peso</option>
+                            <option value="maintain">Mantener peso</option>
+                            <option value="gain">Ganar músculo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 mt-8 pt-6 border-t">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-700">2. Preferencias y Entrenamiento</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                             <h3 class="text-lg font-medium text-gray-700 mb-2">Preferencias Dietéticas</h3>
+                            <label for="diet" class="block text-sm font-medium text-gray-700">Tipo de dieta</label>
+                            <select id="diet" name="diet" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="any">Ninguna (Omnívoro)</option>
+                                <option value="vegetarian">Vegetariano</option>
+                                <option value="vegan">Vegano</option>
+                            </select>
+                            <label for="exclude" class="block text-sm font-medium text-gray-700 mt-4">Excluir Alimentos (separados por comas)</label>
+                            <input type="text" id="exclude" name="exclude" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: brócoli, salmón, nueces">
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-700 mb-3">Días de Entrenamiento</h3>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                <div class="relative flex items-start">
+                                    <input id="lunes" value="Lunes" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="lunes" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Lunes</label>
+                                </div>
+                                <div class="relative flex items-start">
+                                    <input id="martes" value="Martes" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="martes" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Martes</label>
+                                </div>
+                                <div class="relative flex items-start">
+                                    <input id="miercoles" value="Miércoles" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="miercoles" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Miércoles</label>
+                                </div>
+                                <div class="relative flex items-start">
+                                    <input id="jueves" value="Jueves" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="jueves" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Jueves</label>
+                                </div>
+                                <div class="relative flex items-start">
+                                    <input id="viernes" value="Viernes" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="viernes" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Viernes</label>
+                                </div>
+                                <div class="relative flex items-start">
+                                    <input id="sabado" value="Sábado" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="sabado" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Sábado</label>
+                                </div>
+                                <div class="relative flex items-start">
+                                    <input id="domingo" value="Domingo" name="training-day" type="checkbox" class="hidden day-checkbox">
+                                    <label for="domingo" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Domingo</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center mb-8">
+            <button id="generate-plan" class="btn-primary text-lg w-full md:w-auto">
+                <span class="flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V7.618a1 1 0 01.553-.894L9 4l6.447 2.724A1 1 0 0116 7.618v8.764a1 1 0 01-.553.894L9 20zM9 4v16" /></svg>
+                    Generar mi Plan Personalizado
+                </span>
+            </button>
+        </div>
+
+        <div id="plan-result" class="hidden">
+            <div id="summary" class="card p-6 mb-8"></div>
+            <div id="tip-of-the-day" class="card p-6 mb-8"></div>
+            <div class="card p-6 md:p-8">
+                <div id="week-tabs" class="flex flex-wrap border-b border-gray-200 mb-4"></div>
+                <div id="meal-plan-container"></div>
+            </div>
+        </div>
+
+        <div id="loader" class="hidden justify-center items-center py-10">
+            <div class="loader"></div>
+            <p class="ml-4 text-gray-600 font-semibold">Generando tu plan de 8 semanas. Esto puede tardar un momento...</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative text-center" role="alert">
+            <strong class="font-bold">¡Error!</strong>
+            <span class="block sm:inline">Por favor, completa todos los campos con valores válidos.</span>
+        </div>
+    </div>
+
+    <div id="recipe-modal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="recipe-title" class="text-2xl font-bold text-blue-700">Receta Sugerida</h2>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div id="recipe-content" class="text-gray-700 space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS DE COMIDAS COMPLETAS ---
+        const mealDatabase = {
+            breakfast: [
+                { name: "Revuelto de huevos con espinacas y pavo", ingredients: "2 huevos, 2 claras, 50g pavo, espinacas", tags: ['vegetarian-ok'], type: 'protein', calories: 350, protein: 30, carbs: 5, fat: 20 },
+                { name: "Avena con proteína whey y frutas", ingredients: "50g avena, 30g proteína whey, frutos rojos", tags: ['vegetarian'], type: 'high-carb', calories: 400, protein: 35, carbs: 50, fat: 8 },
+                { name: "Tostada integral con aguacate y huevo", ingredients: "1 tostada integral, 1/2 aguacate, 2 huevos", tags: ['vegetarian'], type: 'balanced', calories: 380, protein: 20, carbs: 30, fat: 20 },
+                { name: "Yogur griego con nueces y fruta", ingredients: "200g yogur griego, 30g nueces, 1 pera", tags: ['vegetarian'], type: 'balanced', calories: 320, protein: 25, carbs: 25, fat: 15 },
+                { name: "Tortilla de atún y claras", ingredients: "2 claras, 1 lata atún, espinacas", tags: [], type: 'protein', calories: 250, protein: 30, carbs: 3, fat: 12 },
+                { name: "Tostada integral con salmón ahumado y queso fresco", ingredients: "1 tostada integral, 50g salmón, 50g queso fresco", tags: ['fish'], type: 'balanced', calories: 300, protein: 22, carbs: 25, fat: 12 },
+                { name: "Pudding de chía con leche de almendras", ingredients: "30g chía, 200ml leche almendras, fruta", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 280, protein: 10, carbs: 30, fat: 15 },
+                { name: "Revuelto de tofu con verduras", ingredients: "150g tofu, pimiento, cebolla, cúrcuma", tags: ['vegan', 'vegetarian'], type: 'protein', calories: 300, protein: 25, carbs: 10, fat: 18 },
+            ],
+            lunch: [
+                { name: "Ensalada de pollo, quinoa y aguacate", ingredients: "150g pollo, 60g quinoa, mix de hojas, 1/2 aguacate", tags: [], type: 'high-carb', calories: 550, protein: 45, carbs: 40, fat: 20 },
+                { name: "Lentejas estofadas con verduras", ingredients: "350g lentejas con verduras (sin chorizo)", tags: ['vegan', 'vegetarian'], type: 'high-carb', calories: 450, protein: 25, carbs: 70, fat: 5 },
+                { name: "Salmón a la plancha con boniato y espárragos", ingredients: "180g salmón, 150g boniato, espárragos", tags: ['fish'], type: 'high-carb', calories: 600, protein: 40, carbs: 45, fat: 28 },
+                { name: "Pechuga de pavo con brócoli al vapor", ingredients: "200g pavo, 300g brócoli", tags: [], type: 'protein', calories: 400, protein: 50, carbs: 15, fat: 10 },
+                { name: "Ternera a la plancha con patata asada", ingredients: "180g ternera, 150g patata, ensalada", tags: ['meat'], type: 'high-carb', calories: 500, protein: 40, carbs: 35, fat: 20 },
+                { name: "Guiso de garbanzos con espinacas", ingredients: "150g garbanzos, espinacas, tomate", tags: ['vegan', 'vegetarian'], type: 'high-carb', calories: 480, protein: 22, carbs: 80, fat: 8 },
+                { name: "Wok de tofu y verduras con arroz integral", ingredients: "150g tofu, mix de verduras, 60g arroz integral", tags: ['vegan', 'vegetarian'], type: 'high-carb', calories: 520, protein: 28, carbs: 65, fat: 15 },
+            ],
+            dinner: [
+                { name: "Merluza a la plancha con champiñones", ingredients: "200g merluza, 300g champiñones", tags: ['fish'], type: 'protein', calories: 380, protein: 45, carbs: 10, fat: 15 },
+                { name: "Crema de calabacín con picatostes integrales", ingredients: "Crema de calabacín, 30g picatostes", tags: ['vegetarian'], type: 'balanced', calories: 300, protein: 10, carbs: 35, fat: 12 },
+                { name: "Revuelto de setas con gambas", ingredients: "200g setas, 150g gambas, ajos tiernos", tags: [], type: 'protein', calories: 350, protein: 35, carbs: 8, fat: 18 },
+                { name: "Dorada al horno con patata panadera", ingredients: "1 dorada, 150g patata, cebolla", tags: ['fish'], type: 'balanced', calories: 450, protein: 40, carbs: 30, fat: 18 },
+                { name: "Ensalada completa con atún y huevo duro", ingredients: "Mix de hojas, 2 latas atún, 1 huevo, verduras", tags: ['fish'], type: 'protein', calories: 400, protein: 40, carbs: 10, fat: 22 },
+                { name: "Hamburguesa de lentejas con ensalada", ingredients: "1 hamburguesa de lentejas, ensalada completa", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 420, protein: 20, carbs: 55, fat: 12 },
+            ],
+            snacks: [
+                { name: "Yogur griego con nueces", ingredients: "1 yogur griego, 20g nueces", tags: ['vegetarian'], type: 'balanced', calories: 250, protein: 15, carbs: 8, fat: 18 },
+                { name: "Manzana con un puñado de almendras", ingredients: "1 manzana, 30g almendras", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 280, protein: 8, carbs: 25, fat: 18 },
+                { name: "Batido de proteína whey", ingredients: "30g proteína whey, agua", tags: ['vegetarian'], type: 'protein', calories: 120, protein: 25, carbs: 3, fat: 2 },
+                { name: "Palitos de zanahoria con hummus", ingredients: "150g zanahoria, 70g hummus", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 200, protein: 8, carbs: 25, fat: 8 },
+                { name: "Queso fresco batido con canela", ingredients: "200g queso fresco batido 0%", tags: ['vegetarian'], type: 'protein', calories: 110, protein: 24, carbs: 4, fat: 0 },
+            ]
+        };
+
+        const form = document.getElementById('user-form');
+        const generateBtn = document.getElementById('generate-plan');
+        const planResultDiv = document.getElementById('plan-result');
+        const summaryDiv = document.getElementById('summary');
+        const tipOfTheDayDiv = document.getElementById('tip-of-the-day');
+        const weekTabsContainer = document.getElementById('week-tabs');
+        const mealPlanContainer = document.getElementById('meal-plan-container');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('error-message');
+        const recipeModal = document.getElementById('recipe-modal');
+        const recipeTitle = document.getElementById('recipe-title');
+        const recipeContent = document.getElementById('recipe-content');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        generateBtn.addEventListener('click', () => {
+            if (!form.checkValidity()) {
+                errorMessage.classList.remove('hidden');
+                planResultDiv.classList.add('hidden');
+                form.reportValidity();
+                return;
+            }
+            errorMessage.classList.add('hidden');
+            planResultDiv.classList.add('hidden');
+            loader.style.display = 'flex';
+
+            setTimeout(() => {
+                try {
+                    const userData = getUserData();
+                    const needs = calculateNutritionalNeeds(userData);
+                    const eightWeekPlan = generateEightWeekPlan(needs, userData);
+                    displayEightWeekPlan(eightWeekPlan, needs, userData);
+                    getNutritionalTip();
+                    
+                    loader.style.display = 'none';
+                    planResultDiv.classList.remove('hidden');
+                    planResultDiv.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error(error);
+                    loader.style.display = 'none';
+                    errorMessage.classList.remove('hidden');
+                    errorMessage.querySelector('span').textContent = error.message || 'Ocurrió un error al generar el plan. Inténtalo de nuevo.';
+                }
+            }, 1000);
+        });
+
+        function getUserData() {
+            const excludedInput = document.getElementById('exclude').value;
+            const trainingDays = Array.from(document.querySelectorAll('input[name="training-day"]:checked')).map(el => el.value);
+            return {
+                age: parseInt(document.getElementById('age').value),
+                gender: document.getElementById('gender').value,
+                weight: parseFloat(document.getElementById('weight').value),
+                height: parseFloat(document.getElementById('height').value),
+                activity: parseFloat(document.getElementById('activity').value),
+                goal: document.getElementById('goal').value,
+                diet: document.getElementById('diet').value,
+                exclude: excludedInput.split(',').map(item => item.trim().toLowerCase()).filter(item => item),
+                trainingDays: trainingDays
+            };
+        }
+        
+        function calculateNutritionalNeeds(data) {
+            let bmr;
+            if (data.gender === 'male') {
+                bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + 5;
+            } else {
+                bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age - 161;
+            }
+            const tdee = bmr * data.activity;
+            
+            let baseCalories;
+            switch (data.goal) {
+                case 'lose': baseCalories = tdee - 400; break;
+                case 'gain': baseCalories = tdee + 300; break;
+                default: baseCalories = tdee; break;
+            }
+
+            const trainingCalories = baseCalories + 150;
+            const trainingRatios = { protein: 0.30, carbs: 0.50, fat: 0.20 };
+            const trainingDayNeeds = {
+                targetCalories: Math.round(trainingCalories),
+                targetProtein: Math.round((trainingCalories * trainingRatios.protein) / 4),
+                targetCarbs: Math.round((trainingCalories * trainingRatios.carbs) / 4),
+                targetFat: Math.round((trainingCalories * trainingRatios.fat) / 9),
+            };
+            
+            const restCalories = baseCalories - 150;
+            const restRatios = { protein: 0.35, carbs: 0.35, fat: 0.30 };
+            const restDayNeeds = {
+                targetCalories: Math.round(restCalories),
+                targetProtein: Math.round((restCalories * restRatios.protein) / 4),
+                targetCarbs: Math.round((restCalories * restRatios.carbs) / 4),
+                targetFat: Math.round((restCalories * restRatios.fat) / 9),
+            };
+
+            return { trainingDayNeeds, restDayNeeds };
+        }
+
+        function filterMealDatabase(preferences) {
+            const { diet, exclude } = preferences;
+            const filteredDB = { breakfast: [], lunch: [], dinner: [], snacks: [] };
+
+            for (const mealType in mealDatabase) {
+                filteredDB[mealType] = mealDatabase[mealType].filter(meal => {
+                    const mealIngredients = meal.ingredients.toLowerCase();
+                    if (exclude.some(excl => mealIngredients.includes(excl))) {
+                        return false;
+                    }
+                    if (diet === 'vegetarian' && !(meal.tags.includes('vegetarian') || meal.tags.includes('vegan'))) {
+                         if(meal.tags.includes('vegetarian-ok') && !exclude.some(excl => mealIngredients.includes(excl))) return true;
+                         return false;
+                    }
+                    if (diet === 'vegan' && !meal.tags.includes('vegan')) {
+                        return false;
+                    }
+                    return true;
+                });
+            }
+            return filteredDB;
+        }
+
+        function generateEightWeekPlan(needs, preferences) {
+            const filteredDB = filterMealDatabase(preferences);
+
+            if (filteredDB.breakfast.length === 0 || filteredDB.lunch.length === 0 || filteredDB.dinner.length === 0) {
+                throw new Error("Tus filtros son demasiado restrictivos y no se puede generar un plan. Por favor, ajústalos.");
+            }
+
+            const plan = [];
+            for (let i = 0; i < 8; i++) {
+                const weeklyPlan = {};
+                const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+                for (const dayName of daysOfWeek) {
+                    const isTrainingDay = preferences.trainingDays.includes(dayName);
+                    weeklyPlan[dayName] = generateDailyMealPlan(filteredDB, isTrainingDay);
+                }
+                plan.push(weeklyPlan);
+            }
+            return plan;
+        }
+        
+        function generateDailyMealPlan(db, isTrainingDay) {
+            const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
+            
+            const getMeal = (mealType, mealKind) => {
+                const options = db[mealType].filter(m => m.type === mealKind);
+                return options.length > 0 ? shuffle(options)[0] : shuffle(db[mealType])[0];
+            };
+
+            let breakfast, lunch, dinner, snack;
+
+            if (isTrainingDay) {
+                breakfast = getMeal('breakfast', 'high-carb');
+                lunch = getMeal('lunch', 'high-carb');
+                dinner = getMeal('dinner', 'protein');
+                snack = getMeal('snacks', 'balanced');
+            } else {
+                breakfast = getMeal('breakfast', 'protein');
+                lunch = getMeal('lunch', 'balanced');
+                dinner = getMeal('dinner', 'balanced');
+                snack = getMeal('snacks', 'protein');
+            }
+            
+            const dailyPlan = { breakfast, lunch, dinner, snacks: snack };
+
+            const totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+            Object.values(dailyPlan).forEach(meal => {
+                totals.calories += meal.calories;
+                totals.protein += meal.protein;
+                totals.carbs += meal.carbs;
+                totals.fat += meal.fat;
+            });
+            dailyPlan.totals = totals;
+            return dailyPlan;
+        }
+
+        function displayEightWeekPlan(plan, needs, userData) {
+            summaryDiv.innerHTML = `
+                <h2 class="text-2xl font-bold mb-4 text-gray-700">Tus Objetivos Diarios</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 border rounded-lg">
+                        <h3 class="font-bold text-lg text-blue-600">💪 Día de Entrenamiento</h3>
+                        <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
+                            <p><strong>Calorías:</strong> ${needs.trainingDayNeeds.targetCalories} kcal</p>
+                            <p><strong>Proteínas:</strong> ${needs.trainingDayNeeds.targetProtein} g</p>
+                            <p><strong>Carbs:</strong> ${needs.trainingDayNeeds.targetCarbs} g</p>
+                            <p><strong>Grasas:</strong> ${needs.trainingDayNeeds.targetFat} g</p>
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h3 class="font-bold text-lg text-green-600">🧘 Día de Descanso</h3>
+                        <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
+                            <p><strong>Calorías:</strong> ${needs.restDayNeeds.targetCalories} kcal</p>
+                            <p><strong>Proteínas:</strong> ${needs.restDayNeeds.targetProtein} g</p>
+                            <p><strong>Carbs:</strong> ${needs.restDayNeeds.targetCarbs} g</p>
+                            <p><strong>Grasas:</strong> ${needs.restDayNeeds.targetFat} g</p>
+                        </div>
+                    </div>
+                </div>`;
+
+            weekTabsContainer.innerHTML = '';
+            mealPlanContainer.innerHTML = '';
+            plan.forEach((weeklyPlan, weekIndex) => {
+                const tab = document.createElement('div');
+                tab.className = 'week-tab';
+                if (weekIndex === 0) tab.classList.add('active');
+                tab.textContent = `Semana ${weekIndex + 1}`;
+                tab.dataset.week = weekIndex;
+                weekTabsContainer.appendChild(tab);
+
+                const weekContent = document.createElement('div');
+                weekContent.id = `week-${weekIndex}-content`;
+                weekContent.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6';
+                if (weekIndex !== 0) weekContent.classList.add('hidden');
+                
+                Object.entries(weeklyPlan).forEach(([dayName, dayPlan]) => {
+                    const isTrainingDay = userData.trainingDays.includes(dayName);
+                    const dayCard = document.createElement('div');
+                    dayCard.className = 'card p-5 flex flex-col';
+                    const mealTitles = { breakfast: '🍳 Desayuno', lunch: '🥗 Comida', dinner: '🍲 Cena', snacks: '🍎 Snacks' };
+                    let mealsHtml = '';
+
+                    Object.entries(mealTitles).forEach(([mealKey, mealTitle]) => {
+                        const meal = dayPlan[mealKey];
+                        mealsHtml += `
+                            <div class="mt-3">
+                                <h4 class="font-bold text-sm text-blue-800">${mealTitle}</h4>
+                                <p class="text-xs text-gray-600">${meal.name}</p>
+                                <button data-meal="${mealTitle}" data-ingredients="${meal.ingredients}" class="generate-recipe-btn btn-secondary mt-2 text-xs w-full">✨ Generar Receta</button>
+                            </div>`;
+                    });
+
+                    dayCard.innerHTML = `
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 flex justify-between items-center">
+                            ${dayName}
+                            ${isTrainingDay ? '<span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">ENTRENO</span>' : ''}
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-2 border-b pb-2">Aprox. ${dayPlan.totals.calories} kcal</p>
+                        ${mealsHtml}`;
+                    weekContent.appendChild(dayCard);
+                });
+                mealPlanContainer.appendChild(weekContent);
+            });
+        }
+
+        async function callGemini(prompt) {
+            // --- CAMBIO IMPORTANTE ---
+            // Solo hay UN sitio donde poner la clave. Aunque el error aparezca en consejos y recetas,
+            // solo tienes que pegar tu clave aquí.
+            // Visita https://aistudio.google.com/app/apikey para crear una gratis.
+            const apiKey = "AIzaSyCB76JEki6HXflIBso0l00_j1OlDcHUtb4";
+
+            if (apiKey === "TU_API_KEY_DE_GEMINI_AQUÍ") {
+                console.error("Error: API Key de Gemini no encontrada. Añádela en el código.");
+                throw new Error("API_KEY_MISSING");
+            }
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) {
+                    console.error("Error en la respuesta de la API:", response);
+                    throw new Error(`Error en la API: ${response.statusText}`);
+                }
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                }
+                return "No se pudo obtener una respuesta de la IA.";
+            } catch (error) {
+                console.error("Error al llamar a la API de Gemini. Esto puede ser un problema de CORS si ejecutas el archivo localmente. Intenta usar un servidor local.", error);
+                if (error instanceof TypeError) {
+                    throw new Error("NETWORK_ERROR");
+                }
+                throw error;
+            }
+        }
+
+        async function getNutritionalTip() {
+            tipOfTheDayDiv.innerHTML = `<div class="flex items-center justify-between"><h3 class="text-xl font-bold text-indigo-700">✨ Consejo del Día</h3><button id="new-tip-btn" class="btn-secondary text-sm">Nuevo Consejo</button></div><div id="tip-content" class="text-gray-600 mt-3 pt-3 border-t">Cargando consejo...</div>`;
+            document.getElementById('new-tip-btn').addEventListener('click', getNutritionalTip);
+            try {
+                const prompt = "Dame un consejo de nutrición corto, útil y fácil de entender para una persona que busca mejorar su alimentación. Escríbelo en español.";
+                const tip = await callGemini(prompt);
+                document.getElementById('tip-content').textContent = tip;
+            } catch (error) {
+                const tipContent = document.getElementById('tip-content');
+                if (error.message === "API_KEY_MISSING") {
+                    tipContent.innerHTML = 'Para ver los consejos, necesitas <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 underline">añadir tu API Key de Gemini</a> en el código del archivo HTML.';
+                } else if (error.message === "NETWORK_ERROR") {
+                     tipContent.innerHTML = '<b>Error de red:</b> Para que la API funcione, abre este archivo usando un servidor local (revisa las instrucciones).';
+                } else {
+                    tipContent.textContent = "No se pudo cargar el consejo. Revisa tu conexión o la API Key.";
+                }
+            }
+        }
+
+        async function getRecipe(mealType, ingredients) {
+            recipeTitle.textContent = `Receta para tu ${mealType}`;
+            recipeContent.innerHTML = '<div class="flex justify-center"><div class="loader"></div></div>';
+            recipeModal.classList.remove('hidden');
+            try {
+                const prompt = `Actúa como un chef nutricionista. Crea una receta de ${mealType} saludable, fácil y rápida de preparar usando principalmente estos ingredientes: ${ingredients}. Proporciona una lista de ingredientes clara y los pasos de preparación numerados. El tono debe ser amigable y motivador. La respuesta debe estar en español y formateada en Markdown simple (títulos con ##, listas con * o 1.).`;
+                const recipe = await callGemini(prompt);
+                let formattedRecipe = recipe.replace(/## (.*)/g, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>').replace(/(\*|\d\.) (.*)/g, '<li class="ml-4">$2</li>');
+                recipeContent.innerHTML = formattedRecipe.replace(/\n/g, '<br>');
+            } catch (error) {
+                if (error.message === "API_KEY_MISSING") {
+                    recipeContent.innerHTML = '<p class="text-red-500">Para generar recetas, necesitas <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 underline">añadir tu API Key de Gemini</a> en el código del archivo HTML.</p>';
+                } else if (error.message === "NETWORK_ERROR") {
+                     recipeContent.innerHTML = '<p class="text-red-500"><b>Error de red:</b> Para que la API funcione, abre este archivo usando un servidor local (revisa las instrucciones).</p>';
+                } else {
+                    recipeContent.innerHTML = '<p class="text-red-500">Hubo un error al generar la receta. Revisa tu conexión o la API Key.</p>';
+                }
+            }
+        }
+
+        closeModalBtn.addEventListener('click', () => recipeModal.classList.add('hidden'));
+
+        weekTabsContainer.addEventListener('click', (e) => {
+            if (e.target && e.target.classList.contains('week-tab')) {
+                weekTabsContainer.querySelectorAll('.week-tab').forEach(tab => tab.classList.remove('active'));
+                mealPlanContainer.querySelectorAll('[id^="week-"]').forEach(content => content.classList.add('hidden'));
+                e.target.classList.add('active');
+                document.getElementById(`week-${e.target.dataset.week}-content`).classList.remove('hidden');
+            }
+        });
+
+        mealPlanContainer.addEventListener('click', (e) => {
+            if (e.target && e.target.classList.contains('generate-recipe-btn')) {
+                getRecipe(e.target.dataset.meal, e.target.dataset.ingredients);
+            }
+        });
+    </script>
+</body>
+</html>
