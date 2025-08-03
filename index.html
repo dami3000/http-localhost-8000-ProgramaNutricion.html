@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente de Nutrición Inteligente con IA (8 Semanas)</title>
+    <title>Asistente de Nutrición y Entrenamiento de Dami con IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,10 +17,6 @@
             border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         .btn-primary {
             background-color: #2563eb;
@@ -93,6 +89,13 @@
             color: white;
             border-color: #2563eb;
         }
+        .swap-meal-btn {
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .swap-meal-btn:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -100,14 +103,15 @@
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         
         <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Asistente de Nutrición Inteligente ✨</h1>
-            <p class="text-lg text-gray-600 mt-2">Tu plan de 8 semanas y recetas personalizadas con IA.</p>
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Asistente de Fitness Inteligente ✨</h1>
+            <p class="text-lg text-gray-600 mt-2">Tu plan de nutrición y entrenamiento de 8 semanas.</p>
         </header>
 
         <div class="card p-6 md:p-8 mb-8">
             <form id="user-form">
-                <h2 class="text-2xl font-bold mb-6 text-gray-700 border-b pb-3">1. Cuéntanos sobre ti</h2>
+                <h2 class="text-2xl font-bold mb-6 text-gray-700 border-b pb-3">1. Datos Personales</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- User data fields -->
                     <div>
                         <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
                         <input type="number" id="age" name="age" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: 28" required>
@@ -147,9 +151,10 @@
                     </div>
                 </div>
 
-                <div class="col-span-1 md:col-span-2 lg:col-span-3 mt-8 pt-6 border-t">
+                <div class="mt-8 pt-6 border-t">
                     <h2 class="text-2xl font-bold mb-6 text-gray-700">2. Preferencias y Entrenamiento</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Diet and Exclusions -->
                         <div>
                              <h3 class="text-lg font-medium text-gray-700 mb-2">Preferencias Dietéticas</h3>
                             <label for="diet" class="block text-sm font-medium text-gray-700">Tipo de dieta</label>
@@ -161,9 +166,11 @@
                             <label for="exclude" class="block text-sm font-medium text-gray-700 mt-4">Excluir Alimentos (separados por comas)</label>
                             <input type="text" id="exclude" name="exclude" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: brócoli, salmón, nueces">
                         </div>
+                        <!-- Training Days and Focus -->
                         <div>
-                            <h3 class="text-lg font-medium text-gray-700 mb-3">Días de Entrenamiento</h3>
-                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                            <h3 class="text-lg font-medium text-gray-700 mb-3">Plan de Entrenamiento</h3>
+                            <label class="block text-sm font-medium text-gray-700">Días de entrenamiento</label>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-1">
                                 <div class="relative flex items-start">
                                     <input id="lunes" value="Lunes" name="training-day" type="checkbox" class="hidden day-checkbox">
                                     <label for="lunes" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Lunes</label>
@@ -192,6 +199,14 @@
                                     <input id="domingo" value="Domingo" name="training-day" type="checkbox" class="hidden day-checkbox">
                                     <label for="domingo" class="cursor-pointer w-full text-center border rounded-md px-3 py-2 text-sm font-medium">Domingo</label>
                                 </div>
+                            </div>
+                            <div id="workout-focus-container" class="mt-4 hidden">
+                                <label for="workout-focus" class="block text-sm font-medium text-gray-700">Enfoque del Entrenamiento</label>
+                                <select id="workout-focus" name="workout-focus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <option value="full_body">Cuerpo Completo</option>
+                                    <option value="upper_lower">Torso / Pierna</option>
+                                    <option value="ppl">Empuje / Tirón / Pierna (PPL)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -239,7 +254,7 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS DE COMIDAS COMPLETAS ---
+        // --- DATABASE ---
         const mealDatabase = {
             breakfast: [
                 { name: "Revuelto de huevos con espinacas y pavo", ingredients: "2 huevos, 2 claras, 50g pavo, espinacas", tags: ['vegetarian-ok'], type: 'protein', calories: 350, protein: 30, carbs: 5, fat: 20 },
@@ -276,7 +291,55 @@
                 { name: "Queso fresco batido con canela", ingredients: "200g queso fresco batido 0%", tags: ['vegetarian'], type: 'protein', calories: 110, protein: 24, carbs: 4, fat: 0 },
             ]
         };
+        const exerciseDatabase = {
+            push: [
+                { name: 'Press de Banca', sets: 4, reps: '8-12' },
+                { name: 'Flexiones', sets: 3, reps: 'Al fallo' },
+                { name: 'Press Militar', sets: 4, reps: '10-12' },
+                { name: 'Fondos en paralelas', sets: 3, reps: '10-15' },
+                { name: 'Elevaciones laterales', sets: 3, reps: '12-15' },
+            ],
+            pull: [
+                { name: 'Dominadas', sets: 4, reps: 'Al fallo' },
+                { name: 'Remo con barra', sets: 4, reps: '8-12' },
+                { name: 'Jalón al pecho', sets: 3, reps: '10-12' },
+                { name: 'Curl de bíceps', sets: 3, reps: '12-15' },
+                { name: 'Face Pull', sets: 3, reps: '15-20' },
+            ],
+            legs: [
+                { name: 'Sentadillas', sets: 4, reps: '8-12' },
+                { name: 'Peso Muerto Rumano', sets: 4, reps: '10-12' },
+                { name: 'Zancadas', sets: 3, reps: '12-15 por pierna' },
+                { name: 'Prensa', sets: 3, reps: '10-15' },
+                { name: 'Elevación de talones', sets: 4, reps: '15-20' },
+            ],
+            upper: [
+                { name: 'Press de Banca', sets: 3, reps: '8-12' },
+                { name: 'Dominadas', sets: 3, reps: 'Al fallo' },
+                { name: 'Press Militar', sets: 3, reps: '10-12' },
+                { name: 'Remo con mancuerna', sets: 3, reps: '10-12 por brazo' },
+                { name: 'Curl de bíceps', sets: 2, reps: '12-15' },
+            ],
+            lower: [
+                { name: 'Sentadillas', sets: 4, reps: '8-12' },
+                { name: 'Peso Muerto', sets: 3, reps: '6-8' },
+                { name: 'Prensa', sets: 3, reps: '10-15' },
+                { name: 'Curl femoral', sets: 3, reps: '12-15' },
+                { name: 'Elevación de talones', sets: 4, reps: '15-20' },
+            ],
+            full_body: [
+                { name: 'Sentadillas', sets: 3, reps: '8-12' },
+                { name: 'Press de Banca', sets: 3, reps: '8-12' },
+                { name: 'Remo con barra', sets: 3, reps: '8-12' },
+                { name: 'Press Militar', sets: 3, reps: '10-12' },
+                { name: 'Plancha', sets: 3, reps: '1 min' },
+            ]
+        };
+        
+        // --- GLOBAL STATE ---
+        let eightWeekPlan = [];
 
+        // --- DOM ELEMENTS ---
         const form = document.getElementById('user-form');
         const generateBtn = document.getElementById('generate-plan');
         const planResultDiv = document.getElementById('plan-result');
@@ -290,6 +353,15 @@
         const recipeTitle = document.getElementById('recipe-title');
         const recipeContent = document.getElementById('recipe-content');
         const closeModalBtn = document.getElementById('close-modal-btn');
+        const workoutFocusContainer = document.getElementById('workout-focus-container');
+
+        // --- EVENT LISTENERS ---
+        document.querySelectorAll('input[name="training-day"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const anyChecked = document.querySelector('input[name="training-day"]:checked');
+                workoutFocusContainer.classList.toggle('hidden', !anyChecked);
+            });
+        });
 
         generateBtn.addEventListener('click', () => {
             if (!form.checkValidity()) {
@@ -306,8 +378,8 @@
                 try {
                     const userData = getUserData();
                     const needs = calculateNutritionalNeeds(userData);
-                    const eightWeekPlan = generateEightWeekPlan(needs, userData);
-                    displayEightWeekPlan(eightWeekPlan, needs, userData);
+                    eightWeekPlan = generateEightWeekPlan(needs, userData); // Store in global state
+                    displayPlan(eightWeekPlan, needs, userData);
                     getNutritionalTip();
                     
                     loader.style.display = 'none';
@@ -321,7 +393,21 @@
                 }
             }, 1000);
         });
+        
+        mealPlanContainer.addEventListener('click', (e) => {
+            const recipeBtn = e.target.closest('.generate-recipe-btn');
+            if (recipeBtn) {
+                getRecipe(recipeBtn.dataset.meal, recipeBtn.dataset.ingredients);
+            }
+            
+            const swapBtn = e.target.closest('.swap-meal-btn');
+            if (swapBtn) {
+                const { week, day, meal } = swapBtn.dataset;
+                swapMeal(parseInt(week), day, meal);
+            }
+        });
 
+        // --- CORE FUNCTIONS ---
         function getUserData() {
             const excludedInput = document.getElementById('exclude').value;
             const trainingDays = Array.from(document.querySelectorAll('input[name="training-day"]:checked')).map(el => el.value);
@@ -334,17 +420,15 @@
                 goal: document.getElementById('goal').value,
                 diet: document.getElementById('diet').value,
                 exclude: excludedInput.split(',').map(item => item.trim().toLowerCase()).filter(item => item),
-                trainingDays: trainingDays
+                trainingDays: trainingDays,
+                workoutFocus: document.getElementById('workout-focus').value
             };
         }
         
         function calculateNutritionalNeeds(data) {
-            let bmr;
-            if (data.gender === 'male') {
-                bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + 5;
-            } else {
-                bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age - 161;
-            }
+            let bmr = (data.gender === 'male')
+                ? 10 * data.weight + 6.25 * data.height - 5 * data.age + 5
+                : 10 * data.weight + 6.25 * data.height - 5 * data.age - 161;
             const tdee = bmr * data.activity;
             
             let baseCalories;
@@ -378,82 +462,200 @@
         function filterMealDatabase(preferences) {
             const { diet, exclude } = preferences;
             const filteredDB = { breakfast: [], lunch: [], dinner: [], snacks: [] };
-
             for (const mealType in mealDatabase) {
                 filteredDB[mealType] = mealDatabase[mealType].filter(meal => {
                     const mealIngredients = meal.ingredients.toLowerCase();
-                    if (exclude.some(excl => mealIngredients.includes(excl))) {
-                        return false;
+                    if (exclude.some(excl => mealIngredients.includes(excl))) return false;
+                    if (diet === 'vegetarian' && !meal.tags.includes('vegetarian') && !meal.tags.includes('vegan')) {
+                         return meal.tags.includes('vegetarian-ok') && !exclude.some(excl => mealIngredients.includes(excl));
                     }
-                    if (diet === 'vegetarian' && !(meal.tags.includes('vegetarian') || meal.tags.includes('vegan'))) {
-                         if(meal.tags.includes('vegetarian-ok') && !exclude.some(excl => mealIngredients.includes(excl))) return true;
-                         return false;
-                    }
-                    if (diet === 'vegan' && !meal.tags.includes('vegan')) {
-                        return false;
-                    }
+                    if (diet === 'vegan' && !meal.tags.includes('vegan')) return false;
                     return true;
                 });
             }
             return filteredDB;
         }
+        
+        function generateWorkoutRoutine(focus, trainingDayIndex) {
+            const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
+            let routineKey;
+            switch (focus) {
+                case 'upper_lower':
+                    routineKey = trainingDayIndex % 2 === 0 ? 'upper' : 'lower';
+                    break;
+                case 'ppl':
+                    const pplMap = ['push', 'pull', 'legs'];
+                    routineKey = pplMap[trainingDayIndex % 3];
+                    break;
+                case 'full_body':
+                default:
+                    routineKey = 'full_body';
+                    break;
+            }
+            const exercisePool = shuffle(exerciseDatabase[routineKey]);
+            return {
+                focus: routineKey.charAt(0).toUpperCase() + routineKey.slice(1),
+                exercises: exercisePool.slice(0, 5) // Get 5 random exercises for the focus
+            };
+        }
 
         function generateEightWeekPlan(needs, preferences) {
             const filteredDB = filterMealDatabase(preferences);
-
-            if (filteredDB.breakfast.length === 0 || filteredDB.lunch.length === 0 || filteredDB.dinner.length === 0) {
-                throw new Error("Tus filtros son demasiado restrictivos y no se puede generar un plan. Por favor, ajústalos.");
+            if (filteredDB.breakfast.length < 2 || filteredDB.lunch.length < 2 || filteredDB.dinner.length < 2) {
+                throw new Error("Tus filtros son demasiado restrictivos. Por favor, ajústalos para tener más variedad.");
             }
 
             const plan = [];
+            let trainingDayCounter = 0;
             for (let i = 0; i < 8; i++) {
                 const weeklyPlan = {};
                 const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
                 for (const dayName of daysOfWeek) {
                     const isTrainingDay = preferences.trainingDays.includes(dayName);
                     weeklyPlan[dayName] = generateDailyMealPlan(filteredDB, isTrainingDay);
+                    if (isTrainingDay) {
+                        weeklyPlan[dayName].workout = generateWorkoutRoutine(preferences.workoutFocus, trainingDayCounter);
+                        trainingDayCounter++;
+                    }
                 }
                 plan.push(weeklyPlan);
             }
             return plan;
         }
         
-        function generateDailyMealPlan(db, isTrainingDay) {
+        function generateDailyMealPlan(db, isTrainingDay, currentMeals = {}) {
             const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
             
-            const getMeal = (mealType, mealKind) => {
-                const options = db[mealType].filter(m => m.type === mealKind);
+            const getMeal = (mealType, mealKind, currentMealName) => {
+                let options = db[mealType].filter(m => m.type === mealKind);
+                if (options.length <= 1 && currentMealName) { // If only one option, can't swap
+                    options = db[mealType];
+                }
+                options = options.filter(m => m.name !== currentMealName);
                 return options.length > 0 ? shuffle(options)[0] : shuffle(db[mealType])[0];
             };
 
             let breakfast, lunch, dinner, snack;
-
             if (isTrainingDay) {
-                breakfast = getMeal('breakfast', 'high-carb');
-                lunch = getMeal('lunch', 'high-carb');
-                dinner = getMeal('dinner', 'protein');
-                snack = getMeal('snacks', 'balanced');
+                breakfast = getMeal('breakfast', 'high-carb', currentMeals.breakfast?.name);
+                lunch = getMeal('lunch', 'high-carb', currentMeals.lunch?.name);
+                dinner = getMeal('dinner', 'protein', currentMeals.dinner?.name);
+                snack = getMeal('snacks', 'balanced', currentMeals.snacks?.name);
             } else {
-                breakfast = getMeal('breakfast', 'protein');
-                lunch = getMeal('lunch', 'balanced');
-                dinner = getMeal('dinner', 'balanced');
-                snack = getMeal('snacks', 'protein');
+                breakfast = getMeal('breakfast', 'protein', currentMeals.breakfast?.name);
+                lunch = getMeal('lunch', 'balanced', currentMeals.lunch?.name);
+                dinner = getMeal('dinner', 'balanced', currentMeals.dinner?.name);
+                snack = getMeal('snacks', 'protein', currentMeals.snacks?.name);
             }
             
             const dailyPlan = { breakfast, lunch, dinner, snacks: snack };
-
             const totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
             Object.values(dailyPlan).forEach(meal => {
-                totals.calories += meal.calories;
-                totals.protein += meal.protein;
-                totals.carbs += meal.carbs;
-                totals.fat += meal.fat;
+                if (meal) {
+                    totals.calories += meal.calories;
+                    totals.protein += meal.protein;
+                    totals.carbs += meal.carbs;
+                    totals.fat += meal.fat;
+                }
             });
             dailyPlan.totals = totals;
             return dailyPlan;
         }
 
-        function displayEightWeekPlan(plan, needs, userData) {
+        function swapMeal(weekIndex, dayName, mealKey) {
+            const userData = getUserData();
+            const filteredDB = filterMealDatabase(userData);
+            const dayPlan = eightWeekPlan[weekIndex][dayName];
+            const isTrainingDay = userData.trainingDays.includes(dayName);
+            
+            const getNewMeal = (mealType, mealKind, currentMealName) => {
+                 let options = filteredDB[mealType].filter(m => m.type === mealKind && m.name !== currentMealName);
+                 if (options.length === 0) { // Fallback if no other option of same type
+                    options = filteredDB[mealType].filter(m => m.name !== currentMealName);
+                 }
+                 return options.length > 0 ? options[Math.floor(Math.random() * options.length)] : dayPlan[mealKey];
+            };
+            
+            let mealKind;
+            if (isTrainingDay) {
+                if (mealKey === 'breakfast' || mealKey === 'lunch') mealKind = 'high-carb';
+                else if (mealKey === 'dinner') mealKind = 'protein';
+                else mealKind = 'balanced';
+            } else {
+                if (mealKey === 'breakfast' || mealKey === 'snacks') mealKind = 'protein';
+                else mealKind = 'balanced';
+            }
+
+            const newMeal = getNewMeal(mealKey, mealKind, dayPlan[mealKey].name);
+            
+            dayPlan[mealKey] = newMeal;
+            
+            // --- BUG FIX ---
+            // Recalculate totals from scratch, iterating ONLY over meal keys
+            const newTotals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+            const mealKeys = ['breakfast', 'lunch', 'dinner', 'snacks'];
+            
+            mealKeys.forEach(key => {
+                const meal = dayPlan[key];
+                if (meal && typeof meal.calories === 'number') {
+                    newTotals.calories += meal.calories;
+                    newTotals.protein += meal.protein;
+                    newTotals.carbs += meal.carbs;
+                    newTotals.fat += meal.fat;
+                }
+            });
+
+            dayPlan.totals = newTotals;
+            
+            const dayCard = document.querySelector(`[data-day-id="${weekIndex}-${dayName}"]`);
+            if (dayCard) {
+                dayCard.innerHTML = generateDayCardHTML(dayName, dayPlan, getUserData(), weekIndex);
+            }
+        }
+        
+        function generateDayCardHTML(dayName, dayPlan, userData, weekIndex) {
+            const isTrainingDay = userData.trainingDays.includes(dayName);
+            const mealTitles = { breakfast: '🍳 Desayuno', lunch: '🥗 Comida', dinner: '🍲 Cena', snacks: '🍎 Snacks' };
+            let mealsHtml = '';
+
+            Object.entries(mealTitles).forEach(([mealKey, mealTitle]) => {
+                const meal = dayPlan[mealKey];
+                mealsHtml += `
+                    <div class="mt-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-blue-800">${mealTitle}</h4>
+                            <button class="swap-meal-btn" data-week="${weekIndex}" data-day="${dayName}" data-meal="${mealKey}" title="Cambiar comida">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 4l16 16" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-600">${meal.name}</p>
+                        <button data-meal="${mealTitle}" data-ingredients="${meal.ingredients}" class="generate-recipe-btn btn-secondary mt-2 text-xs w-full">✨ Generar Receta</button>
+                    </div>`;
+            });
+            
+            let workoutHtml = '';
+            if (isTrainingDay && dayPlan.workout) {
+                const workout = dayPlan.workout;
+                const exercisesHtml = workout.exercises.map(ex => `<li><span class="font-semibold">${ex.name}:</span> ${ex.sets} x ${ex.reps}</li>`).join('');
+                workoutHtml = `
+                    <div class="mt-4 pt-3 border-t">
+                        <h4 class="font-bold text-sm text-purple-800">🏋️ Rutina: ${workout.focus}</h4>
+                        <ul class="text-xs text-gray-600 list-disc list-inside mt-1">${exercisesHtml}</ul>
+                    </div>`;
+            }
+
+            return `
+                <h3 class="text-xl font-bold mb-2 text-gray-800 flex justify-between items-center">
+                    ${dayName}
+                    ${isTrainingDay ? '<span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">ENTRENO</span>' : ''}
+                </h3>
+                <p class="text-sm text-gray-500 mb-2 border-b pb-2">Aprox. ${dayPlan.totals.calories} kcal</p>
+                ${mealsHtml}
+                ${workoutHtml}
+            `;
+        }
+
+        function displayPlan(plan, needs, userData) {
             summaryDiv.innerHTML = `
                 <h2 class="text-2xl font-bold mb-4 text-gray-700">Tus Objetivos Diarios</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -493,65 +695,33 @@
                 if (weekIndex !== 0) weekContent.classList.add('hidden');
                 
                 Object.entries(weeklyPlan).forEach(([dayName, dayPlan]) => {
-                    const isTrainingDay = userData.trainingDays.includes(dayName);
                     const dayCard = document.createElement('div');
                     dayCard.className = 'card p-5 flex flex-col';
-                    const mealTitles = { breakfast: '🍳 Desayuno', lunch: '🥗 Comida', dinner: '🍲 Cena', snacks: '🍎 Snacks' };
-                    let mealsHtml = '';
-
-                    Object.entries(mealTitles).forEach(([mealKey, mealTitle]) => {
-                        const meal = dayPlan[mealKey];
-                        mealsHtml += `
-                            <div class="mt-3">
-                                <h4 class="font-bold text-sm text-blue-800">${mealTitle}</h4>
-                                <p class="text-xs text-gray-600">${meal.name}</p>
-                                <button data-meal="${mealTitle}" data-ingredients="${meal.ingredients}" class="generate-recipe-btn btn-secondary mt-2 text-xs w-full">✨ Generar Receta</button>
-                            </div>`;
-                    });
-
-                    dayCard.innerHTML = `
-                        <h3 class="text-xl font-bold mb-2 text-gray-800 flex justify-between items-center">
-                            ${dayName}
-                            ${isTrainingDay ? '<span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">ENTRENO</span>' : ''}
-                        </h3>
-                        <p class="text-sm text-gray-500 mb-2 border-b pb-2">Aprox. ${dayPlan.totals.calories} kcal</p>
-                        ${mealsHtml}`;
+                    dayCard.dataset.dayId = `${weekIndex}-${dayName}`;
+                    dayCard.innerHTML = generateDayCardHTML(dayName, dayPlan, userData, weekIndex);
                     weekContent.appendChild(dayCard);
                 });
                 mealPlanContainer.appendChild(weekContent);
             });
         }
 
+        // --- API & UTILITY FUNCTIONS ---
         async function callGemini(prompt) {
-            // --- CAMBIO IMPORTANTE ---
-            // Solo hay UN sitio donde poner la clave. Aunque el error aparezca en consejos y recetas,
-            // solo tienes que pegar tu clave aquí.
-            // Visita https://aistudio.google.com/app/apikey para crear una gratis.
             const apiKey = "AIzaSyCB76JEki6HXflIBso0l00_j1OlDcHUtb4";
-
-            if (apiKey === "TU_API_KEY_DE_GEMINI_AQUÍ") {
-                console.error("Error: API Key de Gemini no encontrada. Añádela en el código.");
-                throw new Error("API_KEY_MISSING");
-            }
+            if (apiKey === "TU_API_KEY_DE_GEMINI_AQUÍ") throw new Error("API_KEY_MISSING");
 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) {
-                    console.error("Error en la respuesta de la API:", response);
-                    throw new Error(`Error en la API: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Error en la API: ${response.statusText}`);
                 const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                if (result.candidates?.[0]?.content?.parts?.[0]) {
                     return result.candidates[0].content.parts[0].text;
                 }
                 return "No se pudo obtener una respuesta de la IA.";
             } catch (error) {
-                console.error("Error al llamar a la API de Gemini. Esto puede ser un problema de CORS si ejecutas el archivo localmente. Intenta usar un servidor local.", error);
-                if (error instanceof TypeError) {
-                    throw new Error("NETWORK_ERROR");
-                }
+                if (error instanceof TypeError) throw new Error("NETWORK_ERROR");
                 throw error;
             }
         }
@@ -605,12 +775,7 @@
                 document.getElementById(`week-${e.target.dataset.week}-content`).classList.remove('hidden');
             }
         });
-
-        mealPlanContainer.addEventListener('click', (e) => {
-            if (e.target && e.target.classList.contains('generate-recipe-btn')) {
-                getRecipe(e.target.dataset.meal, e.target.dataset.ingredients);
-            }
-        });
     </script>
 </body>
 </html>
+
