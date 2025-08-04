@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente de Nutrición y Entrenamiento de Dami con IA</title>
+    <title>Asistente de Nutrición y Entrenamiento con IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,7 +103,7 @@
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         
         <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Asistente de Fitness Inteligente de DAMI ✨</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Asistente de Fitness Inteligente ✨</h1>
             <p class="text-lg text-gray-600 mt-2">Tu plan de nutrición y entrenamiento de 8 semanas.</p>
         </header>
 
@@ -257,38 +257,55 @@
         // --- DATABASE ---
         const mealDatabase = {
             breakfast: [
-                { name: "Revuelto de huevos con espinacas y pavo", ingredients: "2 huevos, 2 claras, 50g pavo, espinacas", tags: ['vegetarian-ok'], type: 'protein', calories: 350, protein: 30, carbs: 5, fat: 20 },
+                // Omnivore
+                { name: "Revuelto de huevos con espinacas y pavo", ingredients: "2 huevos, 2 claras, 50g pavo, espinacas", tags: ['meat'], type: 'protein', calories: 350, protein: 30, carbs: 5, fat: 20 },
+                { name: "Tortilla de atún y claras", ingredients: "2 claras, 1 lata atún, espinacas", tags: ['fish'], type: 'protein', calories: 250, protein: 30, carbs: 3, fat: 12 },
+                { name: "Tostada integral con salmón ahumado y queso fresco", ingredients: "1 tostada integral, 50g salmón, 50g queso fresco", tags: ['fish'], type: 'balanced', calories: 300, protein: 22, carbs: 25, fat: 12 },
+                // Vegetarian
                 { name: "Avena con proteína whey y frutas", ingredients: "50g avena, 30g proteína whey, frutos rojos", tags: ['vegetarian'], type: 'high-carb', calories: 400, protein: 35, carbs: 50, fat: 8 },
                 { name: "Tostada integral con aguacate y huevo", ingredients: "1 tostada integral, 1/2 aguacate, 2 huevos", tags: ['vegetarian'], type: 'balanced', calories: 380, protein: 20, carbs: 30, fat: 20 },
                 { name: "Yogur griego con nueces y fruta", ingredients: "200g yogur griego, 30g nueces, 1 pera", tags: ['vegetarian'], type: 'balanced', calories: 320, protein: 25, carbs: 25, fat: 15 },
-                { name: "Tortilla de atún y claras", ingredients: "2 claras, 1 lata atún, espinacas", tags: [], type: 'protein', calories: 250, protein: 30, carbs: 3, fat: 12 },
-                { name: "Tostada integral con salmón ahumado y queso fresco", ingredients: "1 tostada integral, 50g salmón, 50g queso fresco", tags: ['fish'], type: 'balanced', calories: 300, protein: 22, carbs: 25, fat: 12 },
-                { name: "Pudding de chía con leche de almendras", ingredients: "30g chía, 200ml leche almendras, fruta", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 280, protein: 10, carbs: 30, fat: 15 },
-                { name: "Revuelto de tofu con verduras", ingredients: "150g tofu, pimiento, cebolla, cúrcuma", tags: ['vegan', 'vegetarian'], type: 'protein', calories: 300, protein: 25, carbs: 10, fat: 18 },
+                // Vegan
+                { name: "Pudding de chía con leche de almendras", ingredients: "30g chía, 200ml leche almendras, fruta", tags: ['vegan'], type: 'balanced', calories: 280, protein: 10, carbs: 30, fat: 15 },
+                { name: "Revuelto de tofu con verduras y cúrcuma", ingredients: "150g tofu, pimiento, cebolla, cúrcuma", tags: ['vegan'], type: 'protein', calories: 300, protein: 25, carbs: 10, fat: 18 },
+                { name: "Batido de proteína vegana con plátano", ingredients: "30g proteína vegana, 1 plátano, 250ml leche de soja", tags: ['vegan'], type: 'high-carb', calories: 350, protein: 30, carbs: 40, fat: 8 },
             ],
             lunch: [
-                { name: "Ensalada de pollo, quinoa y aguacate", ingredients: "150g pollo, 60g quinoa, mix de hojas, 1/2 aguacate", tags: [], type: 'high-carb', calories: 550, protein: 45, carbs: 40, fat: 20 },
-                { name: "Lentejas estofadas con verduras", ingredients: "350g lentejas con verduras (sin chorizo)", tags: ['vegan', 'vegetarian'], type: 'high-carb', calories: 450, protein: 25, carbs: 70, fat: 5 },
+                // Omnivore
+                { name: "Ensalada de pollo, quinoa y aguacate", ingredients: "150g pollo, 60g quinoa, mix de hojas, 1/2 aguacate", tags: ['meat'], type: 'high-carb', calories: 550, protein: 45, carbs: 40, fat: 20 },
                 { name: "Salmón a la plancha con boniato y espárragos", ingredients: "180g salmón, 150g boniato, espárragos", tags: ['fish'], type: 'high-carb', calories: 600, protein: 40, carbs: 45, fat: 28 },
-                { name: "Pechuga de pavo con brócoli al vapor", ingredients: "200g pavo, 300g brócoli", tags: [], type: 'protein', calories: 400, protein: 50, carbs: 15, fat: 10 },
+                { name: "Pechuga de pavo con brócoli al vapor", ingredients: "200g pavo, 300g brócoli", tags: ['meat'], type: 'protein', calories: 400, protein: 50, carbs: 15, fat: 10 },
                 { name: "Ternera a la plancha con patata asada", ingredients: "180g ternera, 150g patata, ensalada", tags: ['meat'], type: 'high-carb', calories: 500, protein: 40, carbs: 35, fat: 20 },
-                { name: "Guiso de garbanzos con espinacas", ingredients: "150g garbanzos, espinacas, tomate", tags: ['vegan', 'vegetarian'], type: 'high-carb', calories: 480, protein: 22, carbs: 80, fat: 8 },
-                { name: "Wok de tofu y verduras con arroz integral", ingredients: "150g tofu, mix de verduras, 60g arroz integral", tags: ['vegan', 'vegetarian'], type: 'high-carb', calories: 520, protein: 28, carbs: 65, fat: 15 },
+                // Vegetarian
+                { name: "Bowl de quinoa con huevo duro y aguacate", ingredients: "80g quinoa, 2 huevos duros, 1/2 aguacate, verduras", tags: ['vegetarian'], type: 'balanced', calories: 500, protein: 25, carbs: 50, fat: 22 },
+                // Vegan
+                { name: "Lentejas estofadas con verduras", ingredients: "350g lentejas con verduras (sin chorizo)", tags: ['vegan'], type: 'high-carb', calories: 450, protein: 25, carbs: 70, fat: 5 },
+                { name: "Guiso de garbanzos con espinacas y tomate", ingredients: "150g garbanzos, espinacas, tomate", tags: ['vegan'], type: 'high-carb', calories: 480, protein: 22, carbs: 80, fat: 8 },
+                { name: "Wok de tofu y verduras con arroz integral", ingredients: "150g tofu, mix de verduras, 60g arroz integral", tags: ['vegan'], type: 'high-carb', calories: 520, protein: 28, carbs: 65, fat: 15 },
+                { name: "Curry de garbanzos con leche de coco", ingredients: "150g garbanzos, 100ml leche coco, arroz basmati", tags: ['vegan'], type: 'balanced', calories: 550, protein: 20, carbs: 70, fat: 20 },
             ],
             dinner: [
+                // Omnivore
                 { name: "Merluza a la plancha con champiñones", ingredients: "200g merluza, 300g champiñones", tags: ['fish'], type: 'protein', calories: 380, protein: 45, carbs: 10, fat: 15 },
-                { name: "Crema de calabacín con picatostes integrales", ingredients: "Crema de calabacín, 30g picatostes", tags: ['vegetarian'], type: 'balanced', calories: 300, protein: 10, carbs: 35, fat: 12 },
                 { name: "Revuelto de setas con gambas", ingredients: "200g setas, 150g gambas, ajos tiernos", tags: [], type: 'protein', calories: 350, protein: 35, carbs: 8, fat: 18 },
                 { name: "Dorada al horno con patata panadera", ingredients: "1 dorada, 150g patata, cebolla", tags: ['fish'], type: 'balanced', calories: 450, protein: 40, carbs: 30, fat: 18 },
                 { name: "Ensalada completa con atún y huevo duro", ingredients: "Mix de hojas, 2 latas atún, 1 huevo, verduras", tags: ['fish'], type: 'protein', calories: 400, protein: 40, carbs: 10, fat: 22 },
-                { name: "Hamburguesa de lentejas con ensalada", ingredients: "1 hamburguesa de lentejas, ensalada completa", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 420, protein: 20, carbs: 55, fat: 12 },
+                // Vegetarian
+                { name: "Crema de calabacín con picatostes integrales", ingredients: "Crema de calabacín, 30g picatostes", tags: ['vegetarian'], type: 'balanced', calories: 300, protein: 10, carbs: 35, fat: 12 },
+                { name: "Tortilla francesa con queso y ensalada", ingredients: "2 huevos, 30g queso, ensalada verde", tags: ['vegetarian'], type: 'protein', calories: 350, protein: 25, carbs: 8, fat: 24 },
+                // Vegan
+                { name: "Hamburguesa de lentejas con ensalada", ingredients: "1 hamburguesa de lentejas, ensalada completa", tags: ['vegan'], type: 'balanced', calories: 420, protein: 20, carbs: 55, fat: 12 },
+                { name: "Salteado de Heura con pimientos", ingredients: "100g Heura, pimiento rojo y verde, cebolla", tags: ['vegan'], type: 'protein', calories: 320, protein: 25, carbs: 15, fat: 15 },
             ],
             snacks: [
+                // Omnivore / Vegetarian
                 { name: "Yogur griego con nueces", ingredients: "1 yogur griego, 20g nueces", tags: ['vegetarian'], type: 'balanced', calories: 250, protein: 15, carbs: 8, fat: 18 },
-                { name: "Manzana con un puñado de almendras", ingredients: "1 manzana, 30g almendras", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 280, protein: 8, carbs: 25, fat: 18 },
                 { name: "Batido de proteína whey", ingredients: "30g proteína whey, agua", tags: ['vegetarian'], type: 'protein', calories: 120, protein: 25, carbs: 3, fat: 2 },
-                { name: "Palitos de zanahoria con hummus", ingredients: "150g zanahoria, 70g hummus", tags: ['vegan', 'vegetarian'], type: 'balanced', calories: 200, protein: 8, carbs: 25, fat: 8 },
                 { name: "Queso fresco batido con canela", ingredients: "200g queso fresco batido 0%", tags: ['vegetarian'], type: 'protein', calories: 110, protein: 24, carbs: 4, fat: 0 },
+                // Vegan
+                { name: "Manzana con un puñado de almendras", ingredients: "1 manzana, 30g almendras", tags: ['vegan'], type: 'balanced', calories: 280, protein: 8, carbs: 25, fat: 18 },
+                { name: "Palitos de zanahoria con hummus", ingredients: "150g zanahoria, 70g hummus", tags: ['vegan'], type: 'balanced', calories: 200, protein: 8, carbs: 25, fat: 8 },
+                { name: "Edamame al vapor con sal", ingredients: "150g edamame", tags: ['vegan'], type: 'protein', calories: 180, protein: 15, carbs: 12, fat: 8 },
             ]
         };
         const exerciseDatabase = {
@@ -466,11 +483,14 @@
                 filteredDB[mealType] = mealDatabase[mealType].filter(meal => {
                     const mealIngredients = meal.ingredients.toLowerCase();
                     if (exclude.some(excl => mealIngredients.includes(excl))) return false;
-                    if (diet === 'vegetarian' && !meal.tags.includes('vegetarian') && !meal.tags.includes('vegan')) {
-                         return meal.tags.includes('vegetarian-ok') && !exclude.some(excl => mealIngredients.includes(excl));
+                    
+                    if (diet === 'vegan') {
+                        return meal.tags.includes('vegan');
                     }
-                    if (diet === 'vegan' && !meal.tags.includes('vegan')) return false;
-                    return true;
+                    if (diet === 'vegetarian') {
+                        return !meal.tags.includes('meat') && !meal.tags.includes('fish');
+                    }
+                    return true; // For 'any' diet
                 });
             }
             return filteredDB;
@@ -707,7 +727,7 @@
 
         // --- API & UTILITY FUNCTIONS ---
         async function callGemini(prompt) {
-            const apiKey = "AIzaSyCB76JEki6HXflIBso0l00_j1OlDcHUtb4";
+            const apiKey = "TU_API_KEY_DE_GEMINI_AQUÍ";
             if (apiKey === "TU_API_KEY_DE_GEMINI_AQUÍ") throw new Error("API_KEY_MISSING");
 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
@@ -778,4 +798,5 @@
     </script>
 </body>
 </html>
+
 
